@@ -16,7 +16,7 @@ BMM is NIST's :red:`B`\ eamline for :red:`M`\ aterials :red:`M`\ easurement.
 .. toctree::
    :maxdepth: 2
    :numbered:
-   :caption: User documentation
+   :caption: Goniometer User
 
    intro.rst
    coordinated.rst

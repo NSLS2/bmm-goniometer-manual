@@ -13,6 +13,55 @@
 Detectors
 =========
 
+.. _dwelltime:
+
+Measurement Time
+----------------
+
+Each kind of detector has a parameter that relates to the length of an
+individual measurement.  For an electrometer, this might be called an
+averaging time, for a counter it might be called a count time or
+integration time, for an area detector or a camera it might be called
+an exposure time.
+
+In this |bsui| profile, each such parameter of each detector in use is
+identified and configured in such a way that a single object is
+used to set the measurement time correctly for each detector in use.
+
+This is done in a way that uses the same syntax as any of the motors
+discussed in :numref:`Section %s <coordinated>`.  Measurement times
+are controlled by an object called ``dwell_time``.  To see the current
+value of the measurement time:
+
+.. code-block:: python
+
+   dwell_time.position
+
+and to set a new measurement time:
+
+.. code-block:: python
+
+   RE(mv(dwell_time, 0.5))
+
+So, if you want to take a 5 second exposure on the :numref:`Mythen
+(Section %s) <mythen>` detector and include the :numref:`monitor
+(Section %s) <monitor>` signal, you could do:
+
+.. code-block:: python
+
+   RE(mv(dwell_time, 5))
+   RE(count([struck, mythen], 1))
+
+
+
+Some of the alignment scans discussed in :numref:`Section %s <align>`
+as well as the XRR scan discussed in :numref:`Section %s <xrr>` will
+either take a measurement time argument to the function call or will
+set a default measurement time by setting the ``dwell_time`` parameter
+accordingly.
+
+
+.. _monitor:
 
 Monitor
 -------
@@ -62,7 +111,7 @@ This is set by this command:
    set_monitor('bicron')
 
 The default is for the Bicron to be the monitor.  The APD can be set
-as the monitor by giving ``apd`` as the argument to the
+as the monitor by giving ``'apd'`` as the argument to the
 ``set_monitor()`` command.
 
 The struck detectors can be measured by doing
@@ -78,18 +127,42 @@ The monitor will be included in the detector list for any alignment or
 measurement plan.  That is, the monitor will always be included in any
 measurement. 
 
+.. _mythen:
+
 Mythen
 ------
 
-`Dectris Mythen2 <https://dectris.com/en/detectors/x-ray-detectors/mythen2/>`__
+Vendor web page for the `Dectris Mythen2
+<https://dectris.com/en/detectors/x-ray-detectors/mythen2/>`__.
 
-.. _fig-mythen:
-.. figure:: _images/align/gap.jpg
-   :target: _images/gap.jpg
-   :width: 75%
-   :align: center
 
-   The Mythen2 mounted on the delta arm of the goniometer.
+Should you find the Mythen IOC unresponsive, the solution is usually
+to power cycle the Mythen controller and restart the IOC.  The
+controller can be power cycled using the power switch on the back side
+of the small, black box shown in :numref:`Figure %s <fig-mythen>`.
+The IOC is running on ``xf06bm-det-ioc1``.  ssh to that machine, then
+use your BNL credentials to do
+
+.. code-block:: bash
+
+   dzdo manage-iocs restart mythen-det2
+
+Once restarted, you may need to restart |bsui| to connect to the IOC.
+
+
+.. subfigure::  AB
+   :layout-sm: AB
+   :gap: 8px
+   :subcaptions: above
+   :name: fig-mythen
+   :class-grid: outline
+
+   .. image:: _images/align/gap.jpg
+
+   .. image:: _images/detectors/mythen_controller.jpg
+
+   (Left) The Mythen2 mounted on the delta arm of the goniometer.
+   (Right) The Mythen controller secured to the table.
 
 
 Count on the Mythen:
@@ -110,6 +183,23 @@ ROIs:
  ``refl``         The reflected beam, a wider ROI than ``dir``
 ==============   =====================================================
 
+The maximum count rate across all the strips of the Mythen is also
+available as ``max_counts`` and is hinted, so will be included in the
+on-screen table and available for plotting or other uses.
+
+These scalars are individually accessible:
+
+.. code-block:: python
+
+   mythen.roi1.get()       # the integral over mca_full
+   mythen.roi2.get()       # the integral over mca_dir
+   mythen.roi3.get()       # the integral over refl
+   mythen.max_counts.get()
+
+There is also a fourth ROI, ``mythen.roi4`` that is available but not
+normally used.
+
+
 Plot most recent exposure of the Mythen:
 
 .. code-block:: python
@@ -121,12 +211,19 @@ where the argument displays an ROI boundary. N=0 shows the
 shows the ``refl`` ROI boundary.
 
 
+.. todo:: Discuss the HDF5 files and how to find them.  Discuss using
+	  data from HDF5 and from Tiled.
 
+
+.. _eiger:
 
 Eiger
 -----
 
 `Dectris Eiger2S <https://dectris.com/en/detectors/x-ray-detectors/eiger2/>`__
+
+`Notes on the Eiger from the main beamline manual
+<https://nsls2.github.io/bmm-beamline-manual/details.html#eiger2-si-4m>`__
 
 
 .. admonition:: Future tech!
@@ -143,17 +240,16 @@ Eiger
 
    The Eiger2S 4M detector.
 
-
+.. _pilatus:
 
 Pilatus
 -------
 
 `Dectris Pilatus 100K
 <https://media.dectris.com/Technical_Specification_PILATUS_100K-S_V1_8.pdf>`__.
-Note, we have an older model of this detector.
+Note that we have an older model of this detector.
 
-
-.. note:: Compare to the Eiger, our Pilatus is older and smaller, has
+.. note:: Compared to the Eiger, our Pilatus is older and smaller, has
 	  fewer features, and is more complicated to integrate.  The
 	  Pilatus is still useful, though, and will be fully supported
 	  by the goniometer profile.
@@ -168,6 +264,8 @@ Note, we have an older model of this detector.
 
    The Pilatus 100K detector.
 
+
+.. _cameras:
 
 Optical Cameras
 ---------------

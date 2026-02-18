@@ -53,6 +53,12 @@ All of these motors can be moved using standard movement plans, e.g.:
    RE(mvr(eta, 0.2))
    RE(mv(delta, 7.1)) 
 
+A motor position is found, for example, by:
+
+.. code-block:: python
+
+   chi.position
+
 Individual slits and table axes are documented below.
 
 
@@ -89,6 +95,15 @@ plans, e.g.:
 
    RE(mvr(slits.vsize, 0.2))
    RE(mv(slits.b, 0.1)) 
+
+The position of a physical or pseudo motor can be found, for example,
+by:
+
+.. code-block:: python
+
+   slits.hsize.position
+   slits.t.position
+
 
 .. attention::
 
@@ -130,14 +145,22 @@ where the target position is the binary representation of the
 attenuator foils.  In this example, position 3 means that foils #1 and
 #2 are in the beam path.
 
-As there are four foils in the attenuator holder, valid positions are
-any integer between 0 and 15, inclusive.
+As there are four foils in the attenuator holder of thicknesses 1, 2,
+4, and 8. So, valid positions are any integer between 0 and 15,
+inclusive.
 
 This implementation allows the attenuator setting to be hinted, thus
 reportable like any motor axis or scalar.  It can show up in the
 best-effort callback table printed to the screen, it can be a record
 of a measurement, it can be written to an output file or included in a
 plot.
+
+You can get the current numerical value of the attenuator by:
+
+.. code-block:: python
+
+   attenuator.attenuation.position
+
 
 You can get a report about the attenuator status written to the screen
 with:
@@ -190,6 +213,15 @@ plans, e.g.:
    RE(mvr(table.vertical, 0.2))
    RE(mv(table.yuo, 4.41)) 
 
+The position of a physical or pseudo motor can be found, for example,
+by:
+
+.. code-block:: python
+
+   table.lateral.position
+   table.yd.position
+
+
 The positions of the table motors and pseudomotors can be seen with
 
 .. code-block:: python
@@ -209,14 +241,14 @@ The positions of the table motors and pseudomotors can be seen with
 Photon delivery system
 ----------------------
 
-Full control over the photo delivery system is given using the same
+Full control over the photon delivery system is given using the same
 code as is used for the XAS end station.  While and experiment
 performed a the standard energy of 8.6 keV probably won't need to
-touch the photo delivery system, the are several situations where this
-might be helpful, for example:
+touch the photon delivery system, the are several situations where
+this might be helpful, for example:
 
 + adjust the yaw or bend of the focusing mirror
-+ change to different energy
++ change to a different energy
 + adjust either the post-mono or hutch slits
 + retune the pitch of the monochromator
 
@@ -282,7 +314,7 @@ adjustments to the yaw, e.g.:
    RE(mvr(m2.yaw, 0.01))
 
 can fine tune the orientation of the focused beam such that the axes
-of the elliptical beam profile are parallel to the goniometer slit
+of the elliptical beam shape are parallel to the goniometer slit
 blades.
 
 Adjusting the bender can be used to optimize the vertical focus of the

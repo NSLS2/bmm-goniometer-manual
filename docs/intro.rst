@@ -15,7 +15,7 @@ Introduction to BMM
 BMM is NIST's :red:`B`\ eamline for :red:`M`\ aterials :red:`M`\ easurement.
 
 At the unix command line, do this to start the Bluesky user
-interface:
+interface, |bsui|:
 
 .. code-block:: bash
 
@@ -40,27 +40,15 @@ one will need to do at the beamline, including:
 TL;DR
 -----
 
-..
-   **Open/close the shutter**
-      ``shb.open()`` and ``shb.close()``, see :numref:`{name}, Section {number} <shutters>`
 
-   **Sample alignment scans**
-       Use the ``RE(linescan())`` command, see :numref:`{name}, Section {number} <linescan>`
+**Open/close the shutter**
+   ``shb.open()`` and ``shb.close()``, see :numref:`{name}, Section {number} <shutters>`
 
+**Sample alignment scans**
+   Use the ``RE(linescan())`` command, see :numref:`{name}, Section {number} <linescan>`
 
-..
-   **Change energy**
-      Use the ``RE(change_edge())`` command, see :numref:`{name}, Section {number} <pds>`
-
-
-   **XAFS scan**
-      Use the ``RE(xafs())`` command, see :numref:`{name}, Section {number} <xafsscan>`
-
-   **Import an automation spreadsheet**
-      Prepare a spreadsheet, then ``xlsx()``, see :numref:`{name}, Section {number} <automation>`
-
-   **Details, details, details**
-      :numref:`Command cheatsheet, Section {number} <cheatsheet>`
+**Cheatsheet**
+   :numref:`Command cheatsheet, Section {number} <cheatsheet>`
 
 
 Essential links

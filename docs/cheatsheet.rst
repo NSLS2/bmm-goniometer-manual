@@ -38,7 +38,7 @@ discussed in the previous sections.
           syntax.  Same for ``RE()`` and ``%`` when specified.  
 
 General commands
-________________
+----------------
 
 .. todo:: Fix cross-links
 
@@ -55,6 +55,9 @@ ________________
 ``RE(mv(attenuator, N))``
   Set attenuator, N is an integer between 0 and 15 |harr| :numref:`Section %s <attenuator>`
 
+``RE(mv(dwell_time, 0.5))``
+  Set measurememt time  |harr| :numref:`Section %s <dwelltime>`
+
 ``RE(count([detector], N))``
   Count on a detector N times.  Detector can be ``struck``, ``mythen``, etc
 
@@ -66,10 +69,10 @@ ________________
 
 
 Alignment scans
-_______________
+---------------
 
 ``RE(align_slits())``
-  Align slits around beam with beam position set to slit position = 0 |harr| :numref:`Section %s <slit_align>`
+  Align slits around beam and make beam position at slit position = 0 |harr| :numref:`Section %s <slit_align>`
 
 ``RE(linescan(dethor, 'mythen', -3, 3, 61)``
   Align the dethor motor to center detector on beam |harr| :numref:`Section %s <dethor_align>`
@@ -78,7 +81,7 @@ _______________
   Mythen calibration routine |harr| :numref:`Section %s <mythen_cal>`
 
 Measurement scans
-_________________
+-----------------
 
 ``RE(xrr())``
   Make an XRR scan
