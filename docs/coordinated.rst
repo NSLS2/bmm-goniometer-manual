@@ -34,8 +34,8 @@ Goniometer axes
  ``eta``         vertical |theta|
  ``chi``         chi
  ``phi``         phi
- ``mu``          horizontal 2\ |theta|
- ``nu``          horizontal |theta|
+ ``mu``          horizontal |theta|
+ ``nu``          horizontal 2\ |theta|
  ``anal``        analyzer |theta|
  ``det``         analyzer 2\ |theta|
  ``dethor``      detector horizontal motion
@@ -307,11 +307,12 @@ Focusing mirror
 The focusing mirror is driven to the correct location when setting up
 for XRD operations.  That said, adjustments to the mirror might be
 needed to optimize the beam delivery to the goniometer.  For example,
-adjustments to the yaw, e.g.:
+adjustments to the yaw and lateral positions of M2, e.g.:
 
 .. code-block:: python
 
    RE(mvr(m2.yaw, 0.01))
+   RE(mvr(m2.lateral, 0.5))
 
 can fine tune the orientation of the focused beam such that the axes
 of the elliptical beam shape are parallel to the goniometer slit
@@ -372,6 +373,8 @@ can be seen with
    m3.wh()
 
 as shown in :numref:`Figure %s <fig-mirrorswh>`.
+
+.. _blslits:
 
 Post-mono and hutch Slits
 ~~~~~~~~~~~~~~~~~~~~~~~~~

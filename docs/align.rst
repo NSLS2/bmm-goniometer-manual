@@ -7,6 +7,11 @@
 
    See the LICENSE file for details.
 
+.. role:: key
+    :class: key
+
+
+
 .. _align:
 
 Goniometer alignment for XRR
@@ -27,6 +32,74 @@ XRD mode of the Photon Delivery System
 
    Also need to explain how to use that to change energy
 
+
+.. _linescan:
+
+Generic motor scans
+-------------------
+
+The alignment chores discussed below are implemented as specialized
+applications of a generic linescan.  A linescan is when you move a
+motor and plot the signal on a detector.
+
+At BMM, you can make a linescan using almost any motor on the
+beamline, including coordinated virtual axes such as ``slits.hcenter``
+:numref:`(see Section %s) <goniometer_slits>` or ``table.vertical``
+:numref:`(see Section %s) <goniometer_table>`.  Any detector
+discussed in :numref:`Section %s <detectors>` can be plotted during
+the linescan.
+
+The syntax of a linescan is
+
+.. code-block:: python
+
+   RE(linescan(motor, detector, start, stop, nsteps))
+
+where
+
+motor:
+  The name of the motor, any name given in :numref:`Section {number}, {name}
+  <coordinated>`
+
+detector:
+  A string indicating the signal from a scalar or a detector ROI, as
+  discussed in :numref:`Section {number}, {name}  <detectors>`
+
+start:
+  The starting point of the scan, in relative units from the current
+  position of the motor (an integer or float)
+
+start:
+  The stopping point of the scan, in relative units from the current
+  position of the motor (an integer or float)
+
+nsteps:
+  The number of steps in the scan (an integer)
+
+
+After a scan is finished, the user is prompted to "pluck" a point from
+the plot.  If you respond :key:`y` or simply hit :key:`Enter`,
+you have 20 seconds to click on a spot on the plot.  A second prompts
+then verifies that you clicked correctly before moving the motor from
+the linescan to the selected point.
+
+.. _fig-pluckprompt:
+.. figure:: _images/align/pluckprompt.png
+   :target: _images/pluckprompt.png
+   :width: 80%
+   :align: center
+
+   The on-screen prompt to pluck a position from the linescan that
+   just finished.
+
+You can redo this point selection followed by motor motion with any
+plot still on screen.  Simply do
+
+.. code-block:: python
+
+   RE(pluck())
+
+then follow the prompts.
 
 
 Direct beam camera
@@ -130,8 +203,8 @@ Open the slits to their fully open position:
 
 .. code-block:: python
 
-   RE(mvr(slits.hsize, 8))
-   RE(mvr(slits.vsize, 8))
+   RE(mv(slits.hsize, 8))
+   RE(mv(slits.vsize, 8))
 
 The direct beam should still be visible on the direct beam camera.
 
@@ -154,21 +227,21 @@ The optional arguments to this plan are
   If True, move to the centroid (default is True)
 
 ``calibrate``
-  If True, reset offset so that centroid is at 0
+  If True, reset offset so that centroid is at 0 (default is True)
 
 ``inttime``
   Scan dwell time (default is 0.5 seconds)
 
 
 
-The slit alignment procedure will run a linescan :olive:`(need link to
-linescan explanation)` on each of the four slits individually,
-plotting the signal on the monitor :olive:`(need link to monitor
-explanation)` versus slit position.  This signal should be a step-like
-function, so the result is fit to an error function.  The slit is
-moved to the centroid of the fitted error function and the offset of
-the slit is reset to define the zero position.  The result of an
-individual slit scan looks like :numref:`Figure %s <fig-slitscan>`.
+The slit alignment procedure will run a :numref:`linescan (Section %s)
+<linescan>` on each of the four slits individually, plotting the
+signal on the monitor versus slit position.  This signal should be a
+step-like function, so the result is fit to an error function.  The
+slit is moved to the centroid of the fitted error function and the
+offset of the slit is reset to define the zero position.  The result
+of an individual slit scan looks like :numref:`Figure %s
+<fig-slitscan>`.
 
 .. _fig-slitscan:
 .. figure:: _images/align/slit_bot.png
@@ -178,13 +251,14 @@ individual slit scan looks like :numref:`Figure %s <fig-slitscan>`.
 
    The fit to an individual slit scan, in this case, bottom blade.
 
-Once aligned and calibrated, set the slit size for the experiment,
-something like 
+Once aligned and calibrated, the slit size for the experiment is set
+to 1 mm iun the horizontal and 0.12 mm in the vertical.  This is the
+equivalent of 
 
 .. code-block:: python
 
-   RE(mvr(slits.hsize, 1))
-   RE(mvr(slits.vsize, 0.120))
+   RE(mv(slits.hsize, 1))
+   RE(mv(slits.vsize, 0.120))
 
 .. _dethor_align:
 
@@ -201,13 +275,13 @@ beam, something like:
 
 .. code-block:: python
 
-   RE(mv(attenuator, 7))
+   RE(mv(attenuator, 6))
 
 then perform a linescan of the dethor motor:
 
 .. code-block:: python
 
-   RE(linescan(dethor, 'mythen', -3, 3, 61)
+   RE(linescan(dethor, 'mca_full', -3, 3, 61))
 
 The live plot will show the progress of the scan.  Once the scan is
 finished, some simple peak interpretation is performed, shown in
