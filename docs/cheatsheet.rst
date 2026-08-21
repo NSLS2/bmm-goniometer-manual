@@ -40,8 +40,6 @@ discussed in the previous sections.
 General commands
 ----------------
 
-.. todo:: Fix cross-links
-
 
 ``shb.open()`` / ``shb.close()``
   Open / close the photon shutter |harr| :numref:`Section %s <shutters>`
@@ -65,7 +63,17 @@ General commands
   move a motor, plot a signal |harr| :numref:`Section %s <linescan>`
 
 ``RE(pluck())``
-  Select a point from a plot on screen and move that motor to that position |harr| :numref:`Section %s <pluck>`
+  Select a point from a plot on screen and move that motor to that position |harr| :numref:`Figure %s <fig-pluckprompt>`
+
+
+
+Refine beam shape and position
+------------------------------
+``RE(mv(m2.yaw, 0.01))``
+  Adjust M2 yaw  |harr| :numref:`Section %s <focusing_mirror>`
+
+``RE(mv(m2.lateral, 0.01))``
+  Adjust M2 lateral position  |harr| :numref:`Section %s <focusing_mirror>`
 
 
 Alignment scans

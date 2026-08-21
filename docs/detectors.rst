@@ -127,6 +127,37 @@ The monitor will be included in the detector list for any alignment or
 measurement plan.  That is, the monitor will always be included in any
 measurement. 
 
+
+.. _i0:
+
+Upstream ion chamber
+--------------------
+
+The upstream ion chamber |nd| I0 in an XAS experiment |nd| is
+available as ``ic0``.  This i sthe ion chamber just after the
+:numref:`slits (Section %s) <blslits>` in diagnostic module 3 and just
+before the evacuated transport pipe.
+
+.. _fig-ic0:
+.. figure:: _images/detectors/i0.jpg
+   :target: _images/i0.jpg
+   :width: 70%
+   :align: center
+
+   The upstream ion chamber
+
+You can count it like so:
+
+.. code-block:: python
+
+   RE(count([ic0], 1))
+
+While not used for any scattering experiments, this detector is
+essential for other chores, including changing energy on the
+monochromator and providing a feedback signal to keep the beam on the
+goniometer slits.
+
+
 .. _mythen:
 
 Mythen
@@ -148,6 +179,8 @@ use your BNL credentials to do
    dzdo manage-iocs restart mythen-det2
 
 Once restarted, you may need to restart |bsui| to connect to the IOC.
+
+.. note:: Only beamline and DSSI staff can restart IOCs
 
 
 .. subfigure::  AB
@@ -220,16 +253,17 @@ shows the ``refl`` ROI boundary.
 Eiger
 -----
 
-`Dectris Eiger2S <https://dectris.com/en/detectors/x-ray-detectors/eiger2/>`__
+Vendor web page for the `Dectris Eiger2S
+<https://dectris.com/en/detectors/x-ray-detectors/eiger2/>`__
 
-`Notes on the Eiger from the main beamline manual
-<https://nsls2.github.io/bmm-beamline-manual/details.html#eiger2-si-4m>`__
+For instructions on how to turn on the Eiger, initialize the detector,
+and establish an ophyd connection, see the `notes on the Eiger from
+the main beamline manual
+<https://nsls2.github.io/bmm-beamline-manual/details.html#eiger2-si-4m>`__.
 
 
-.. admonition:: Future tech!
-
-   Integrate the Eiger and use it for pole figure measurements.
-
+Here is a picture of the Eiger.  At this time (Aug 2026) we are still
+waiting on a way to mount the Eiger on the delta arm of the goniometer.
 
 .. _fig-eiger:
 .. figure:: _images/detectors/eiger.jpg
@@ -239,6 +273,96 @@ Eiger
 
 
    The Eiger2S 4M detector.
+
+The object for the Eiger is called ``eiger``.  Like any other
+detector, it can be counted
+
+.. code-block:: python
+
+   RE(count([eiger], 1))
+
+This will show a table on screen of the signals in the three ROIs.
+
+ROIs:
+
+==============   =====================================================
+ ROI              description
+==============   =====================================================
+ ``mca_full``     The integral of the entire detector
+ ``dir``          The direct beam, a tight ROI around the main signal
+ ``refl``         The reflected beam, a wider ROI than ``dir``
+==============   =====================================================
+
+.. note:: These ROI names are provisional.  The Eiger has not been
+	  used for any actual measurements at the time of this
+	  writing. (Aug 2026)
+
+There are 4 ROIs defined for the Eiger.  The ROIs are defined by 4
+integers: minimum values of X and Y, and the sizes in X and Y.  The
+units of all four numbers is pixels, count from the top, left corner
+of the detector.
+
+``eiger.get_rois(N)``
+   Get the 4 ROI settings for ROI #N, where N is 1, 2, 3, or 4.  This
+   will print something like this to the screen:
+
+   .. code-block:: text
+      
+      ROI1: 68 251 1525 45
+
+   where the integers are minX, sizeX, minY, and sizeY.  It also 
+   returns a tuple containing those setting in the same order.
+
+``eiger.set_rois(N, (mx, sx, my, sy))``
+   Set the 4 ROI settings for ROI #N, where N is 1, 2, 3, or 4.  The
+   second argument is a tuple containing minX, sizeX, minY, and sizeY
+   values in that order.
+
+The default operation of the Eiger is make images of signed integer
+value.  This gives a bit depth of 2\ :sup:`31`.  It also means that
+the pixels in the area between the panes of the detector will have
+value -1.  
+
+With unsigned integers, the bit depth is 2\ :sup:`32`, but the pixels
+in between the panes will have values of 2\ :sup:`31`-1.  That's
+probably less convenient (in that it would require the subtraction of
+a dark image), but it does double the dynamic range of the detector.
+
+You can toggle between signed and unsigned integers with 
+
+.. code-block:: python
+
+   eiger.set_signed_data(True)   # signed integers
+   eiger.set_signed_data(False)  # unsigned integers
+
+The reason to want to do this is to readily visualize the locations of
+areas between the panes, even when there is no signal on the detector.
+Here are examples of dark images using signed and unsigned integers.
+
+
+.. subfigure::  ABC
+   :layout-sm: ABC
+   :gap: 8px
+   :subcaptions: above
+   :name: fig-eiger_datatype
+   :class-grid: outline
+
+   .. image:: _images/detectors/eiger_signed.png
+
+   .. image:: _images/detectors/eiger_unsigned.png
+
+   .. image:: _images/detectors/eiger_counting.png
+
+   (Left) An Eiger dark image using signed integer images.
+   (Middle) An Eiger dark image using unsigned integer images.  Here
+   the margins between panes are clearly visible, as are bad pixels
+   and pixels illuminated by some form of noise.
+   (Right) The bsui command line while measuring these images.  Note
+   that the noise pixels result in very large values for one of the
+   ROIs in the unsigned integer measurement, while all three ROIs are
+   small for signed integers.
+
+
 
 .. _pilatus:
 
