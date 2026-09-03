@@ -208,13 +208,13 @@ This will show a table on screen of the signals in the three ROIs.
 
 ROIs:
 
-==============   =====================================================
- ROI              description
-==============   =====================================================
- ``mca_full``     The integral of the entire detector
- ``dir``          The direct beam, a tight ROI around the main signal
- ``refl``         The reflected beam, a wider ROI than ``dir``
-==============   =====================================================
+======= ==============   =====================================================
+ROI #    ROI name         description
+======= ==============   =====================================================
+ 1       ``mca_full``     The integral of the entire detector
+ 2       ``dir``          The direct beam, a tight ROI around the main signal
+ 3       ``refl``         The reflected beam, a wider ROI than ``dir``
+======= ==============   =====================================================
 
 The maximum count rate across all the strips of the Mythen is also
 available as ``max_counts`` and is hinted, so will be included in the
@@ -239,10 +239,17 @@ Plot most recent exposure of the Mythen:
 
    mythen.plot(N)
 
-where the argument displays an ROI boundary. N=0 shows the
-``mca_full`` ROI boundaries.  N=1 shows the ``dir`` ROI boundary.  N=1
+where the argument displays an ROI boundary. N=1 shows the
+``mca_full`` ROI boundaries.  N=2 shows the ``dir`` ROI boundary.  N=3
 shows the ``refl`` ROI boundary.
 
+You can specify the X axis range like so:
+
+.. code-block:: python
+
+   mythen.plot(3, 190, 220)
+
+That will limit the range of the plot to pixels 190 through 220.
 
 .. todo:: Discuss the HDF5 files and how to find them.  Discuss using
 	  data from HDF5 and from Tiled.
@@ -378,6 +385,10 @@ Note that we have an older model of this detector.
 	  Pilatus is still useful, though, and will be fully supported
 	  by the goniometer profile.
 
+.. note:: The interface to the Pilatus is identical to the Eiger.  The
+	  commands described above for setting and getting ROI values
+	  on the ``eiger`` work the same for ``pilatus``.  There is no
+	  signed data setting on the Pilatus.
 
 .. _fig-pilatus:
 .. figure:: _images/detectors/pilatus.jpg

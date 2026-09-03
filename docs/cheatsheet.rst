@@ -37,12 +37,33 @@ discussed in the previous sections.
 .. note:: Parentheses |nd| ``()`` |nd| are an essential part of the
           syntax.  Same for ``RE()`` and ``%`` when specified.  
 
-General commands
-----------------
+Helper commands
+---------------
 
+These commands bypass the run engine and are intended for command line use only.  
 
 ``shb.open()`` / ``shb.close()``
   Open / close the photon shutter |harr| :numref:`Section %s <shutters>`
+
+``%ct`` / ``%ct N``
+  Count the monitor for the current dwell time, or count the monitor for the specified time
+
+``%ctm`` / ``%ctm N``
+  Count the monitor nd the Mythen for the current dwell time, or count
+  the monitor for the specified time
+
+``%att N``
+  Set the attenuator level between 0 and 15 |harr| :numref:`Section %s <attenuator>`
+
+``%dt N``
+  Set the dwell time to a value in seconds. If the value cannot be
+  interpreted as a number, it will be set to 0.5 seconds.
+
+General commands
+----------------
+
+``show_symbols()``
+  Print device and plan names to the screen
 
 ``RE(mv(delta, <value>))``
   Move any named motor TO a position (``delta`` is an example) |harr| :numref:`Section %s <goniometer_axes>`
@@ -53,11 +74,15 @@ General commands
 ``RE(mv(attenuator, N))``
   Set attenuator, N is an integer between 0 and 15 |harr| :numref:`Section %s <attenuator>`
 
+``RE(mv(slits.vsize, 0.15))``
+  Set the goniometer slit size |harr| :numref:`Section %s <goniometer_slits>`
+
 ``RE(mv(dwell_time, 0.5))``
   Set measurememt time  |harr| :numref:`Section %s <dwelltime>`
 
-``RE(count([detector], N))``
-  Count on a detector N times.  Detector can be ``struck``, ``mythen``, etc
+``RE(count([detector], N))`` / ``RE(count([detector1, detector2, ...], N))``
+  Count on a detector N times.  Detector can be ``struck``,
+  ``mythen``, etc.  Can also be a list of detectors.
 
 ``RE(linescan(<motor>, <detector>, <start>, <stop>, <N>))``
   move a motor, plot a signal |harr| :numref:`Section %s <linescan>`
@@ -87,6 +112,19 @@ Alignment scans
 
 ``RE(mythen_calibration(-4, 1, 1001))``
   Mythen calibration routine |harr| :numref:`Section %s <mythen_cal>`
+
+..
+   linescan
+   mythen_calibration
+   align_delta
+   sample_vertical
+   sample_pitch
+   verify_delta_eta
+   eta_calibration
+   slitscan
+   align_slits
+   xrr
+   
 
 Measurement scans
 -----------------
