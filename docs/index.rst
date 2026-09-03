@@ -21,6 +21,7 @@ BMM is NIST's :red:`B`\ eamline for :red:`M`\ aterials :red:`M`\ easurement.
    intro.rst
    coordinated.rst
    detectors.rst
+   plans.rst
    align.rst
    xrr.rst
    cheatsheet.rst
