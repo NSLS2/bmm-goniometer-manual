@@ -224,10 +224,10 @@ These scalars are individually accessible:
 
 .. code-block:: python
 
-   mythen.roi1.get()       # the integral over mca_full
-   mythen.roi2.get()       # the integral over mca_dir
-   mythen.roi3.get()       # the integral over refl
-   mythen.max_counts.get()
+   mythen.stats1.total.get()       # the integral over mca_full
+   mythen.stats2.total.get()       # the integral over mca_dir
+   mythen.stats3.total.get()       # the integral over refl
+   mythen.stats1.max_value.get()   # the largest pixel value 
 
 There is also a fourth ROI, ``mythen.roi4`` that is available but not
 normally used.
