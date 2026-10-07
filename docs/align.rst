@@ -17,6 +17,22 @@
 Preparing for XRR
 =================
 
+To start bsui using the goniometer profile:
+
+.. code-block:: bash
+
+   cd ~/git/bmm-profile-goniometer
+   pixi run start
+
+.. _fig-bsui:
+.. figure:: _images/software/bsui_startup.png
+   :target: _images/bsui_startup.png
+   :width: 100%
+   :align: center
+
+   bsui startup
+
+
 
 XRD mode of the photon delivery system
 --------------------------------------
@@ -64,6 +80,13 @@ Finally, the hutch slits will be opened wide, 7 mm wide by 1 mm tall,
 allowing the beam size to be determined by the :numref:`gomiometer
 slits (see Section %s) <goniometer_slits>`.
 
+Once finished, engage the :numref:`DCM feedback system (see Section
+%s) <feedback>`:  
+
+.. code-block::
+
+   feedback.engage()
+
 .. admonition:: Future tech!
 
    This plan will eventually be used to perform scattering
@@ -92,6 +115,21 @@ Goniometer alignment strategy
 	  associated data processing are discussed in detail in
 	  :numref:`Section %s <plans>`.
 
+#. Move the ``delta`` arm to 30 degrees to allow room for the YAG
+   camera and its mount.  Secure the mount for the YAG camera to the
+   mounting fixture on the floor, as shown in :numref:`Figure %s
+   <fig-yag_camera>`.
+
+
+   .. _fig-yag_camera:
+   .. figure:: _images/align/yag_mount.jpg
+      :target: _images/yag_mount.jpg
+      :width: 30%
+      :align: center
+
+      The YAG camera mounted on its holder.
+
+
 #. Place the Mythen in the most downstream position on the
    :olive:`(what is the arm called?)`. Measure and record the gap value
    |nd| typically around 90 mm.  See :numref:`Figure %s <fig-gap>` for a
@@ -111,6 +149,11 @@ Goniometer alignment strategy
 	 RE(mv(slits.vsize, 4))
 	 RE(mv(slits.hsize, 4))
 
+      and set the attenuators to 0 
+
+      .. code-block:: python
+
+	 RE(mv(attenuator, 0))
 
    b. Adjust ``samplez`` to put the pin in the beam by seeing its shadow
       on the YAG.  
@@ -120,7 +163,20 @@ Goniometer alignment strategy
 	 RE(mvr(samplez, <amount>))
 
    c. Mark the position of the pin in the beam
-   d. Rotate ``phi`` stage by 180 degrees
+
+   d. Rotate ``phi`` stage by 180 degrees.  This is most easily done
+      by loosening the lock (circled in :numref:`Figure %s
+      <fig-phi_axis>`) and rotating the stage by hand.  Be sure to
+      tighten the lock once moved.
+
+      .. _fig-phi_axis:
+      .. figure:: _images/align/phi_axis.jpg
+	 :target: _images/yag_phi_axis.jpg
+	 :width: 30%
+	 :align: center
+
+	 The lock for the ``phi`` axis.
+
    e. Mark pin again, then mark the geometric center of those two
       markings
    f. Move ``table.lateral`` so that the center of the two markings is in
@@ -156,13 +212,18 @@ Goniometer alignment strategy
 
    :numref:`See Section %s <slit_align>` for more details.
 
+   After this step, reduce the amount of attenuation going into the
+   Bicron.  These are the little inserts at the bottom of the box
+   holding the Bicron, but above the beam path.  This is done because
+   small slit height for XRR reduces the signal going into the Bicron.
+
 #. Set slit sizes: 
 
    .. code-block:: python
 
-      RE(mv(slits.vsize, 0.15, slits.hsize, 1.0))
+      RE(mv(slits.vsize, 0.12, slits.hsize, 1.0))
 
-   This vertical size |nd| 150 |mu|\ m |nd| is considerably smaller
+   This vertical size |nd| 120 |mu|\ m |nd| is considerably smaller
    than the focused beam, but appropriate for an XRR measurement.
 
 #. Align the table in the beam:
@@ -209,6 +270,8 @@ Goniometer alignment strategy
 
 You are now ready for sample alignment.
 
+.. _align_sample:
+
 Sample alignment strategy
 -------------------------
 
@@ -219,22 +282,36 @@ center of the beam will be on the center of the sample as the incident
 angle changes and the beam will spread symmetrically over the length
 of the sample as the angle changes.
 
-.. todo:: Need example screenshots of the results of both sample
-          alignment scans.
+Normally, sample alignment is fully automated using this plan:
 
-1. Start by aligning the sample vertically.
+.. code-block:: python
+
+   RE(align_sample())
+
+This performs 3 iterations of the following steps:
+
+1. Align the sample vertically.
 
    .. code-block:: python
 
       RE(sample_vertical())
 
-   This will run a linescan (:numref:`Section %s <linescan>`) of
-   ``samplez`` against the signal in direct beam ROI then fit an error
-   function to the measurement to find the position where the sample
-   blocks half the beam.  That position will be defined as 0 of
-   ``samplez`` by setting the EPICS offset accordingly.
+   This is a linescan (:numref:`Section %s <linescan>`) of the
+   ``samplez`` motor against the signal in direct beam ROI.  Once
+   finished an error function is fit to the measurement to find the
+   position where the sample blocks half the beam.  
 
-2. Then align the pitch of the sample.
+   .. _fig-vertical_align:
+   .. figure:: _images/align/vertical.png
+      :target: _images/vertical.png
+      :width: 40%
+      :align: center
+
+   An example of a step of optimizing the vertical position along with
+   the fitted step-like function used to find the optimal position.
+
+
+2. Align the sample in eta (i.e. pitch relative to the incident beam).
 
    .. code-block:: python
 
@@ -243,21 +320,123 @@ of the sample as the angle changes.
    This will run a linescan (:numref:`Section %s <linescan>`) of
    ``eta`` against the signal in direct beam ROI then do an
    appropriate analysis (more discussion below) to find the zero of
-   ``eta``.  Move to that position and define it as 0 by setting the
-   EPICS offset accordingly.
+   ``eta``.  It then moves to the peak position of the ``dir`` signal
+   and defines it as 0 by setting the EPICS offset accordingly.
 
-3. Iterate those two steps as needed.
+   .. _fig-pitch_align:
+   .. figure:: _images/align/pitch.png
+      :target: _images/picth.png
+      :width: 40%
+      :align: center
 
-The interpretation of the pitch scan is a bit subtle.  In the case of
-a very rough surface, the correct choice for ``eta`` will be very close
-to the peak of the measured scan.
+   An example of a step of optimizing the ``eta`` position along with
+   the peak analysis to find the optimal position.
 
-However, in the case of a very smooth sample, the total external
-reflection will be intense enough that the structure near the peak
-will be such that the maximum intensity is not necessarily the proper
-0 of ``eta``.  In that case, a more elaborate analysis is required.
 
-.. todo:: Fully explain the smooth sample algorithm once it is
-          implemented in code.  Show the result of that analysis.
+The peak position of the direct beam signal |nd| ``dir`` |nd| is the
+default choice in this automation.  The effect of total external
+reflection at shallow angles can be seen in the ``refl`` signal, also
+plotted on screen.
 
+The use of this automation is `strongly` encouraged.  Doing so
+attaches the results of the alignment as metadata to subsequent XRR
+scans.  This allows a trail of experimental provenance throughout the
+experiment, allowing the generation of detailed, useful reports on the
+XRR measurements.  See :numref:`Section %s <reports>`.
+
+If more than 3 iterations are needed, the number of iterations can be
+specified as an argument to the plan:
+
+.. code-block:: python
+
+   RE(align_sample(iterations=3))
+
+The final step to sample alignment is to refine the position of the
+eta motor by performing the so-called "spine" refinement.
+
+This, too, is automated, although it requires a bit more interaction.
+
+The concept is to move to several |nd| typically 4 |nd| values of
+``delta`` and ``eta``, then perform a scan in ``eta`` to find the peak
+intensity in the ``dir`` ROI.  After all the previous goniometer and
+sample alignment steps, ``eta`` might still be a few millidegrees out
+of alignment.  By checking for the ``dir`` peak position at a series
+of ``delta``/\ ``eta`` positions, this small misalignment is corrected.
+
+Start by doing a refinement at ``eta`` = 1 and ``delta`` = 2:
+
+.. code-block:: python
+
+   RE(refine_eta.measure(1))
+
+This will move ``delta`` to 2 and ``eta`` to 1.  It will then
+determine the correct attenuator setting by starting at 6 and stepping
+down until a strong signal is observed in ``dir``, or until the
+attenuator is at setting 0.
+
+It will then do a scan in eta around the current position.  That will
+look something like :numref:`Figure %s <fig-eta_measure>`.
+
+.. _fig-eta_measure:
+.. figure:: _images/align/eta_measure.png
+   :target: _images/eta_measure.png
+   :width: 50%
+   :align: center
+
+   The ``eta`` refinemant scan, shown with the the ``refl`` channel
+   along with the analysis of the ``dir`` peak.
+
+If this result looks reasonable, then store its result by doing
+
+.. code-block:: python
+
+   refine_eta.push()
+
+This will append to the ``refine_eta.points`` variable with
+information from that step of the refinement process.
+
+This procedure is repeated three more time.  Good additional choices
+of positions of ``delta`` and ``eta`` are something like (3,1.5),
+(4,2), and (6,3).  That is, do something like this for the full
+``eta`` refinement:
+
+.. code-block:: python
+
+   RE(refine_eta.measure(1))
+   refine_eta.push()
+   RE(refine_eta.measure(1.5))
+   refine_eta.push()
+   RE(refine_eta.measure(2))
+   refine_eta.push()
+   RE(refine_eta.measure(3))
+   refine_eta.push()
+
+Depending on the details of the sample and its reflectivity, you may
+need to choose different values of ``delta``/\ ``eta`` positions.
+
+Once you are happy with the refinement steps, do:
+
+.. code-block:: python
+
+   refine_eta.compute_offset()
+
+For each point, a difference between the nominal value of ``eta`` and
+the peak of the refinement scan is measured.  This function will
+compute the compute the mean of those differences.  A table
+summarizing the refinement sequence is printed to screen along with
+the average offset in ``eta``.  If the sample was well aligned in
+earlier steps, the correction will be on the order of a millidegree or
+less.
+
+If this all seems correct, do:
+
+.. code-block:: python
+
+   RE(refine_eta.correct_eta())
+
+This will move to the negative of the average ``eta`` offset computed
+above, then reset the offset parameter in EPICS to define the new
+``eta=0`` position.
+
+You are now ready to measure XRR!
 

@@ -59,11 +59,15 @@ These commands bypass the run engine and are intended for command line use only.
   Set the dwell time to a value in seconds. If the value cannot be
   interpreted as a number, it will be set to 0.5 seconds.
 
-General commands
-----------------
-
 ``show_symbols()``
   Print device and plan names to the screen
+
+``whoami()``
+  Print a summary of the current experiment to the screen.
+
+
+General commands
+----------------
 
 ``RE(mv(delta, <value>))``
   Move any named motor TO a position (``delta`` is an example) |harr| :numref:`Section %s <goniometer_axes>`
@@ -113,6 +117,21 @@ Alignment scans
 ``RE(mythen_calibration(-4, 1, 1001))``
   Mythen calibration routine |harr| :numref:`Section %s <mythen_cal>`
 
+``RE(align_sample())``
+  Automated sample alignment. |harr| :numref:`Section %s <sample_alignment>`
+
+``RE(refine_eta.measure(eta))``
+  Do an ``eta`` refinement step at a specified value of ``eta`` |harr|  :numref:`Section %s <sample_alignment>`
+
+``refine_eta.push()``
+  Push a ``RE(refine_eta.measure(eta))`` result to memory.
+
+``refine_eta.compute_offset()``
+  Determine the optimal offset in ``eta``
+
+``RE(refine_eta.correct_eta())``
+  Reset the offest of ``eta`` in EPICS.
+
 ..
    linescan
    mythen_calibration
@@ -129,5 +148,5 @@ Alignment scans
 Measurement scans
 -----------------
 
-``RE(xrr())``
-  Make an XRR scan
+``RE(xrr(trajectory=trajectory))``
+  Make an XRR scan |harr| :numref:`Section %s <xrr>`
