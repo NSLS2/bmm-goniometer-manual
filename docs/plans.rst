@@ -522,40 +522,4 @@ intensity, i.e. where the sample is blocking half of the beam.
 To find the correct angular position |nd| ``eta`` |nd| of the flat
 sample:
 
-.. code-block:: python
-
-   RE(sample_eta())
-
-``start``
-  Starting point measured in degrees from the current position of
-  ``eta``.  Default is -0.25.
-
-``stop``
-  Ending point measured in degrees from the current position of
-  ``eta``.  Default is 0.25.
-
-``nsteps``
-  The number of steps in the scan.  Default is 51.
-
-``inttime``
-  The dwell time in seconds at each step of the scan.  Default is 0.1
-  second.
-
-``choice``
-  A choice of how to select the zero of ``eta``.  The choices are:
-
-  + ``"peak"``: max signal value
-  + ``"com"``: the point of the center of mass of the signal
-  + ``"cen"``: center point of the full width at half max
-  + ``"crossing"``: crossing point of lines regressed to the two sides
-    of the peak
-
-Upon completion of the scan, all the peak statistics (peak, com, cen,
-and crossing) will be computed and reported on screen.  The value of
-``choice`` will be used to move ``eta`` to position.  That position
-will be redefined in EPICS as the zero of ``ete``.
-
-.. todo:: Show a picture
-
-Iteration of ``RE(samples_vertical())`` and ``RE(sample_eta())`` may
-be required.
+.. todo:: Explain this

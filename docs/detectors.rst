@@ -127,6 +127,11 @@ The monitor will be included in the detector list for any alignment or
 measurement plan.  That is, the monitor will always be included in any
 measurement. 
 
+.. admonition:: Future tech!
+
+   Implement and use an ion chamber backed by a black-box electrometer
+   to replace the Bicron/APD.
+
 
 .. _i0:
 
@@ -156,6 +161,67 @@ While not used for any scattering experiments, this detector is
 essential for other chores, including changing energy on the
 monochromator and providing a feedback signal to keep the beam on the
 goniometer slits.
+
+
+.. _feedback:
+
+Mono feedback
+~~~~~~~~~~~~~
+
+A very simple feedback system is implemented using a proportional
+feedback on the pitch of the DCM second crystal and the signal from
+the upstream ion chamber.  In short, this feedback notices when the
+signal on the ion chamber drops and uses a piezo motor to nudged the
+second crystal pitch in the compensating direction.
+
+The Phoebus screens for controlling this system are shown in
+:numref:`Figure %s <fig-feedback>`.  At the top is the screen for
+direct control of the mono piezos.  The rest of the screen is the
+feedback interface.
+
+.. _fig-feedback:
+.. figure:: _images/software/feedback.png
+   :target: _images/feedback.png
+   :width: 70%
+   :align: center
+
+   The Phoebus controls for the feedback system.
+
+This feedback system has some pretty strong guard rails in place.
+
+At the bottom of the feedback screen are a bunch of indicator lights,
+all of which must be green for the feedback system to engage.  These
+are monitoring things like B hutch shutter status and the ring
+current.  If any of these permits are red, the feedback system will
+not actively change the voltage the piezo actuator.
+
+The output voltage to the piezo actuator is limited to be |pm|\ 3.  The
+units on this are |nd| oddly |nd| mm, not volts.  The range of motion
+of the piezo actuator is larger than |pm|\ 3.  in early testing, that
+range was adequate to keep the DCM well tuned for extended periods.
+
+Should the out ever pag at one of the |pm|\ 3 limits, the procedure
+for resetting the feedback is:
+
+.. code-block:: python
+
+   RE(feedback.reset())
+   RE(rocking_curve())
+   feedback.enable()
+
+The first step, turns the feedback off, then resets key parameters in
+a sensible order.  
+
+The second step runs a rocking curve scan of the DCM pitch and moves
+to the peak of intensity on the upstream ion chamber.
+
+The final step re-enables the feedback system.
+
+This takes about 2 minutes.  Once done, the DCM should stay stable for
+hours and days.
+
+
+
 
 
 .. _mythen:
@@ -269,8 +335,11 @@ the main beamline manual
 <https://nsls2.github.io/bmm-beamline-manual/details.html#eiger2-si-4m>`__.
 
 
-Here is a picture of the Eiger.  At this time (Aug 2026) we are still
-waiting on a way to mount the Eiger on the delta arm of the goniometer.
+Here is a picture of the Eiger.  Currently (October 2026) we have a
+crude interface plate for affixing the Eiger to the mount used for the
+Mythen.  This is functional, but not ideal in that its position cannot
+be optimized relative to the beam path.  We expect to have a motorize
+mount for the Eiger in January 2027.
 
 .. _fig-eiger:
 .. figure:: _images/detectors/eiger.jpg
@@ -303,6 +372,13 @@ ROIs:
 .. note:: These ROI names are provisional.  The Eiger has not been
 	  used for any actual measurements at the time of this
 	  writing. (Aug 2026)
+
+.. note:: This section describes the ophyd interface, while we are now
+	  using the ophyd-async interface.  This was enabled by the
+	  transition to the SQL-backed Tiled interface during the
+	  Summer 2026 shutdown.  So, the details of this section need
+	  to be updated to be consistent with ophyd-async |nd|
+	  ``read()``, ``await``, and such
 
 There are 4 ROIs defined for the Eiger.  The ROIs are defined by 4
 integers: minimum values of X and Y, and the sizes in X and Y.  The
@@ -405,4 +481,6 @@ Note that we have an older model of this detector.
 Optical Cameras
 ---------------
 
-.. note:: Optical cameras, currently USB, moving to gigE.
+.. note:: Two USB cameras, two web cams
+
+``usb5``, ``usb6``, ``xrdwebcam``, ``xaswebcam``
